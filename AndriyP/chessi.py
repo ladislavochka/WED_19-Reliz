@@ -2,13 +2,14 @@ import pygame
 import os
 import sys
 import time
+import random
 
 pygame.init()
 pygame.mixer.init()
 
 sq = 80
 pal_h = 90
-clock_h = 25
+clock_h = 55
 
 board_w = sq * 8
 board_h = sq * 8
@@ -161,7 +162,7 @@ while i < 6:
     i = i + 1
 
 
-white_time = 5.0
+white_time = 180.0
 black_time = 180.0
 
 last_moved_color = None
@@ -423,7 +424,11 @@ while running:
 
             if pal_click != None:
 
-                spawn_code = pal_click
+                if spawn_code == pal_click:
+                    spawn_code = None
+                else:
+                    spawn_code = pal_click
+
                 selected_cell = None
 
             else:
@@ -438,7 +443,6 @@ while running:
                     if spawn_code != None:
 
                         board[row][col] = spawn_code
-                        spawn_code = None
 
                     else:
 
@@ -515,6 +519,13 @@ while running:
                 spawn_code = None
 
                 reset_clocks()
+
+            if event.key == pygame.K_n:
+
+                random_row = random.randint(0, 7)
+                random_col = random.randint(0, 7)
+
+                board[random_row][random_col] = "bn"
 
     screen.fill(color_bg)
 
