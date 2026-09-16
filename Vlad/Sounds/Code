@@ -1,0 +1,47 @@
+import customtkinter as ctk
+
+app = ctk.CTk()
+app.title("Filine")
+app.geometry("1300x800")
+
+# Заголовок
+title_name = ctk.CTkLabel(app, text="Filine", font=("Courier New", 20))
+title_name.pack(anchor="w", padx=20, pady=20)
+
+# Создадим отдельный фрейм для элементов управления внизу,
+# чтобы они не конфликтовали с остальным интерфейсом
+controls_frame = ctk.CTkFrame(app, fg_color="transparent")
+#!!ВСЯ КООРДИНАТА Х ОТ ПОЛЗУНКА ДО КОНЦА КНОПОК ПО ОСИ У
+controls_frame.pack(side="bottom", fill="x", pady=40)
+
+# Слайдер времени (можно разместить во фрейме управления или над ним)
+slider_time = ctk.CTkSlider(controls_frame, width=400)
+slider_time.pack(pady=10)
+
+# Фрейм для кнопок в ряд (используем pack с side="left" или grid) !!ПЛАТФОРМА ДЛЯ КНОПОК!!
+buttons_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
+buttons_frame.pack(pady=10)
+
+# Кнопки управления воспроизведением
+remote_button = ctk.CTkButton(buttons_frame, text="Перемотати назад", width=120)
+remote_button.pack(side="left", padx=10)
+
+play_button = ctk.CTkButton(buttons_frame, text="▶️ Почати", width=80)
+play_button.pack(side="left", padx=10)
+
+pause_button = ctk.CTkButton(buttons_frame, text="⏸️ Пауза", width=80)
+pause_button.pack(side="left", padx=10)
+
+rewind_button = ctk.CTkButton(buttons_frame, text="Наступний трек", width=120)
+rewind_button.pack(side="left", padx=10)
+
+
+
+
+
+
+
+
+
+
+app.mainloop()

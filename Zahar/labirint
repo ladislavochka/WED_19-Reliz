@@ -1,0 +1,212 @@
+import pygame
+import sys
+
+pygame.init()
+
+# Размер клетки
+CELL_SIZE = 30
+
+# Лабиринт:
+# # = стена
+# . = проход
+# S = старт
+# E = выход
+maze = [
+    "###############################",
+    "#S....#.......#...............#",
+    "#####.#.#####.#.#############.#",
+    "#.....#.#...#.#.#...........#.#",
+    "#.#####.#.#.#.#.#.#########.#.#",
+    "#.......#.#.#.#.#.#.......#.#.#",
+    "#########.#.#.#.#.#.#####.#.#.#",
+    "#.........#.#.#.#.#.#...#.#...#",
+    "#.#########.#.#.#.#.#.#.#.#####",
+    "#.#.........#.#.#.#.#.#.#.....#",
+    "#.#.#########.#.#.#.#.#.#####.#",
+    "#.#...........#.#.#.#.#.......#",
+    "#.#############.#.#.#########.#",
+    "#...............#.#...........#",
+    "###############.#.#############",
+    "#...............#.#...........#",
+    "#.###############.###########.#",
+    "#.#...........................#",
+    "#.#.#########################.#",
+    "#.#.........................#.#",
+    "#.#########################.#.#",
+    "#.........................#.#.#",
+    "###########################.#.#",
+    "#...........................#.#",
+    "#.###########################.#",
+    "#.............................#",
+    "#############################.#",
+    "#.............................#",
+    "#.###########################.#",
+    "#.............................#",
+    "#############################E#",
+]
+
+ROWS = len(maze)
+COLS = len(maze[0])
+
+WIDTH = COLS * CELL_SIZE
+HEIGHT = ROWS * CELL_SIZE
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Сложный лабиринт")
+
+clock = pygame.time.Clock()
+
+# Цвета
+WALL_COLOR = (25, 25, 35)
+PATH_COLOR = (220, 220, 220)
+PLAYER_COLOR = (50, 150, 255)
+EXIT_COLOR = (50, 220, 100)
+START_COLOR = (255, 200, 50)
+
+# Находим старт
+for y in range(ROWS):
+    for x in range(COLS):
+        if maze[y][x] == "S":
+            player_x = x
+            player_y = y
+
+# Находим выход
+for y in range(ROWS):
+    for x in range(COLS):
+        if maze[y][x] == "E":
+            exit_x = x
+            exit_y = y
+
+
+def draw_maze():
+    screen.fill(PATH_COLOR)
+
+    for y in range(ROWS):
+        for x in range(COLS):
+            cell = maze[y][x]
+
+            rect = pygame.Rect(
+                x * CELL_SIZE,
+                y * CELL_SIZE,
+                CELL_SIZE,
+                CELL_SIZE
+            )
+
+            if cell == "#":
+                pygame.draw.rect(screen, WALL_COLOR, rect)
+
+            elif cell == "S":
+                pygame.draw.rect(screen, START_COLOR, rect)
+
+            elif cell == "E":
+                pygame.draw.rect(screen, EXIT_COLOR, rect)
+
+            # Сетка
+            pygame.draw.rect(
+                screen,
+                (180, 180, 180),
+                rect,
+                1
+            )
+
+    # Игрок
+    player_rect = pygame.Rect(
+        player_x * CELL_SIZE + 5,
+        player_y * CELL_SIZE + 5,
+        CELL_SIZE - 10,
+        CELL_SIZE - 10
+    )
+
+    pygame.draw.rect(
+        screen,
+        PLAYER_COLOR,
+        player_rect,
+        border_radius=7
+    )
+
+
+def move_player(dx, dy):
+    global player_x, player_y
+
+    new_x = player_x + dx
+    new_y = player_y + dy
+
+    # Проверяем границы
+    if new_x < 0 or new_x >= COLS:
+        return
+
+    if new_y < 0 or new_y >= ROWS:
+        return
+
+    # Нельзя пройти через стену
+    if maze[new_y][new_x] == "#":
+        return
+
+    player_x = new_x
+    player_y = new_y
+
+
+# Основной цикл
+while True:
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_UP:
+                move_player(0, -1)
+
+            elif event.key == pygame.K_DOWN:
+                move_player(0, 1)
+
+            elif event.key == pygame.K_LEFT:
+                move_player(-1, 0)
+
+            elif event.key == pygame.K_RIGHT:
+                move_player(1, 0)
+
+            # ESC — выйти
+            elif event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
+
+    # Победа
+    if player_x == exit_x and player_y == exit_y:
+
+        font = pygame.font.Font(None, 70)
+
+        text = font.render(
+            "ТЫ ПОБЕДИЛ!",
+            True,
+            (255, 255, 255)
+        )
+
+        text_rect = text.get_rect(
+            center=(WIDTH // 2, HEIGHT // 2)
+        )
+
+        # Затемнение
+        overlay = pygame.Surface(
+            (WIDTH, HEIGHT)
+        )
+        overlay.set_alpha(200)
+        overlay.fill((0, 0, 0))
+
+        screen.blit(overlay, (0, 0))
+        screen.blit(text, text_rect)
+
+        pygame.display.flip()
+
+        pygame.time.wait(3000)
+
+        pygame.quit()
+        sys.exit()
+
+    draw_maze()
+
+    pygame.display.flip()
+    clock.tick(60)
