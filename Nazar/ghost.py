@@ -5,7 +5,7 @@ ghosts = [
     pygame.Rect(285, 230, 30, 30),
     pygame.Rect(325, 230, 30, 30),
     pygame.Rect(365, 230, 30, 30),
-    pygame.Rect(405, 230, 30, 30)
+    pygame.Rect(300, 230, 30, 30)
 ]
 
 ghost_colors = [
@@ -16,10 +16,10 @@ ghost_colors = [
 ]
 
 directions = [
-    [2, 0],
-    [-2, 0],
-    [0, 2],
-    [0, -2]
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1]
 ]
 
 def move_ghosts(walls):
@@ -38,10 +38,10 @@ def move_ghosts(walls):
                 ghost.y = old_y
 
                 directions[i] = random.choice([
-                    [2, 0],
-                    [-2, 0],
-                    [0, 2],
-                    [0, -2]
+                    [1, 0],
+                    [-1, 0],
+                    [0, 1],
+                    [0, -1]
                 ])
                 break
 
@@ -66,24 +66,19 @@ def draw_ghosts(screen):
         pygame.draw.circle(
             screen,
             (255, 255, 255),
-            (ghost.left + 10, ghost.top + 10),
-            5
-        )
+            (ghost.left + 10, ghost.top + 10), 5)
+
 
         pygame.draw.circle(
             screen,
             (255, 255, 255),
-            (ghost.left + 20, ghost.top + 10),
-            5
-        )
+            (ghost.left + 20, ghost.top + 10), 5)
 
         pygame.draw.circle(
             screen,
             (0, 0, 0),
-            (ghost.left + 10, ghost.top + 10),
-            2
-        )
+            (ghost.left + 10, ghost.top + 10), 3)
 
         pygame.draw.circle(
             screen,
-            (0, 0, 0))
+            (0, 0, 0), (ghost.left + 20, ghost.top +10), 2)
