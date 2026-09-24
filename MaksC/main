@@ -1,7 +1,6 @@
 import customtkinter as ctk
 import random
 
-# Налаштування
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
@@ -10,18 +9,24 @@ class SnakeGame:
     def __init__(self, root):
         self.root = root
         self.root.title("🐍 Змійка")
-        self.root.geometry("620x700")
-        self.root.resizable(False,False)
+        self.root.geometry("650x780")
+        self.root.resizable(False, False)
+
+
+        self.snake_color = "lime"
+        self.background_color = "black"
+
         self.canvas_size = 600
         self.cell_size = 20
 
         self.snake = []
         self.food = None
+
         self.direction = "Right"
         self.next_direction = "Right"
+
         self.score = 0
         self.game_running = False
-
 
         self.title = ctk.CTkLabel(
             root,
@@ -33,38 +38,120 @@ class SnakeGame:
 
         self.score_label = ctk.CTkLabel(
             root,
-            text="Рахунок: 0",
+            text="Яблука: 0",
             font=("Arial", 18)
         )
-        self.score_label.pack(pady=5)
+        self.score_label.pack()
 
-        # Поле гри
+
         self.canvas = ctk.CTkCanvas(
             root,
             width=self.canvas_size,
             height=self.canvas_size,
-            bg="black",
+            bg=self.background_color,
             highlightthickness=2
         )
         self.canvas.pack(pady=10)
 
-        # Кнопка
+
+        settings_frame = ctk.CTkFrame(root)
+        settings_frame.pack(pady=5)
+
+
+        self.snake_menu = ctk.CTkOptionMenu(
+            settings_frame,
+            values=[
+                "Зелена",
+                "Синя",
+                "Червона",
+                "Фіолетова",
+                "Жовта",
+                "Біла"
+            ],
+            command=self.change_snake_color
+        )
+        self.snake_menu.set("Зелена")
+        self.snake_menu.grid(
+            row=0,
+            column=0,
+            padx=10,
+            pady=10
+        )
+
+
+        self.background_menu = ctk.CTkOptionMenu(
+            settings_frame,
+            values=[
+                "Чорний",
+                "Сірий",
+                "Синій",
+                "Білий"
+            ],
+            command=self.change_background
+        )
+        self.background_menu.set("Чорний")
+        self.background_menu.grid(
+            row=0,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+
         self.restart_button = ctk.CTkButton(
             root,
-            text="🔄 Почати гру",
+            text="🔄 Перезапустити",
             width=200,
             height=40,
-            font=("Arial", 16),
             command=self.start_game
         )
-        self.restart_button.pack(pady=10)
+        self.restart_button.pack(pady=5)
 
-        # Керування клавіатурою
-        self.root.bind("<KeyPress>", self.key_pressed)
+
+        self.root.bind(
+            "<KeyPress>",
+            self.key_pressed
+        )
 
         self.start_game()
 
+
+    def change_snake_color(self, choice):
+
+        colors = {
+            "Зелена": "lime",
+            "Синя": "blue",
+            "Червона": "red",
+            "Фіолетова": "purple",
+            "Жовта": "yellow",
+            "Біла": "white"
+        }
+
+        self.snake_color = colors[choice]
+
+        self.draw()
+
+
+    def change_background(self, choice):
+
+        backgrounds = {
+            "Чорний": "black",
+            "Сірий": "gray20",
+            "Синій": "dark blue",
+            "Білий": "white"
+        }
+
+        self.background_color = backgrounds[choice]
+
+        self.canvas.configure(
+            bg=self.background_color
+        )
+
+        self.draw()
+
+
     def start_game(self):
+
         self.snake = [
             [300, 300],
             [280, 300],
@@ -76,16 +163,22 @@ class SnakeGame:
         self.score = 0
         self.game_running = True
 
-        self.score_label.configure(text="Рахунок: 0")
+        self.score_label.configure(
+            text="Яблука: 0"
+        )
 
         self.create_food()
+
         self.draw()
 
         self.root.focus_force()
+
         self.move()
 
     def create_food(self):
+
         while True:
+
             x = random.randrange(
                 0,
                 self.canvas_size,
@@ -102,41 +195,57 @@ class SnakeGame:
                 self.food = [x, y]
                 break
 
+
     def draw(self):
+
         self.canvas.delete("all")
 
-        # Їжа
+
         x, y = self.food
 
+
+        if (self.score + 1) % 10 == 0:
+            food_color = "yellow"
+            size = self.cell_size - 2
+        else:
+            food_color = "red"
+            size = self.cell_size - 6
+
+        offset = (self.cell_size - size) // 2
+
         self.canvas.create_oval(
-            x + 2,
-            y + 2,
-            x + self.cell_size - 2,
-            y + self.cell_size - 2,
-            fill="red",
+            x + offset,
+            y + offset,
+            x + offset + size,
+            y + offset + size,
+            fill=food_color,
             outline=""
         )
 
-        # Змійка
-        for i, segment in enumerate(self.snake):
-            x, y = segment
 
-            if i == 0:
-                color = "lime"
-            else:
-                color = "green"
+        for segment in self.snake:
+
+            x, y = segment
 
             self.canvas.create_rectangle(
                 x + 1,
                 y + 1,
                 x + self.cell_size - 1,
                 y + self.cell_size - 1,
-                fill=color,
+                fill=self.snake_color,
                 outline=""
             )
 
+
+
     def key_pressed(self, event):
+
         key = event.keysym
+
+
+        if key.lower() == "r":
+            self.start_game()
+            return
 
         if key == "Up" and self.direction != "Down":
             self.next_direction = "Up"
@@ -151,6 +260,7 @@ class SnakeGame:
             self.next_direction = "Right"
 
     def move(self):
+
         if not self.game_running:
             return
 
@@ -171,30 +281,38 @@ class SnakeGame:
             head_x += self.cell_size
 
         new_head = [head_x, head_y]
-        # Перевірка стіни
+
         if (
-                head_x < 0
-                or head_x >= self.canvas_size
-                or head_y < 0
-                or head_y >= self.canvas_size
+            head_x < 0
+            or head_x >= self.canvas_size
+            or head_y < 0
+            or head_y >= self.canvas_size
         ):
             self.game_over()
             return
 
-        # Перевірка зіткнення із собою
+
         if new_head in self.snake:
             self.game_over()
             return
 
         self.snake.insert(0, new_head)
 
-        # Якщо з'їли яблуко
+
         if new_head == self.food:
+
             self.score += 1
 
             self.score_label.configure(
-                text=f"Рахунок: {self.score}"
+                text=f"Яблука: {self.score}"
             )
+
+
+            if self.score % 10 == 0:
+
+
+                self.snake.append(self.snake[-1])
+                self.snake.append(self.snake[-1])
 
             self.create_food()
 
@@ -203,12 +321,19 @@ class SnakeGame:
 
         self.draw()
 
-        # Чим більше очок — тим швидша змійка
-        speed = max(60, 150 - self.score * 5)
+        speed = max(
+            60,
+            150 - self.score * 5
+        )
 
-        self.root.after(speed, self.move)
+        self.root.after(
+            speed,
+            self.move
+        )
+
 
     def game_over(self):
+
         self.game_running = False
 
         self.canvas.create_text(
@@ -222,12 +347,12 @@ class SnakeGame:
         self.canvas.create_text(
             self.canvas_size // 2,
             self.canvas_size // 2 + 30,
-            text=f"Рахунок: {self.score}",
+            text=f"Яблук: {self.score}",
             fill="white",
             font=("Arial", 22)
         )
 
-    # Запуск
+
 root = ctk.CTk()
 game = SnakeGame(root)
 root.mainloop()
